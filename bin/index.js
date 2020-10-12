@@ -53,7 +53,8 @@ const asiParams = new Map([
 
 const productParams = new Map([
     ['Jira', require('./assets/productParams').jiraProductParams],
-    ['Confluence', require('./assets/productParams').confluenceProductParams]
+    ['Confluence', require('./assets/productParams').confluenceProductParams],
+    ['Crowd', require('./assets/productParams').jiraProductParams]
 ])
 
 const asiTemplates = new Map([
