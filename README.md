@@ -31,7 +31,7 @@ node .
 ``` 
 
 ## Description
-Aerosol is a work in progress. As of now it will let you manage Jira, Confluence, BitBucket and Crowd AWS CloudFormation stacks. Using Aerosol you can; create, delete and view the current status of a stack. Aerosol also allows you to easily open an ssm session to the associated EC2 instances for a stack.
+Aerosol is a work in progress. As of now it will let you manage Jira, Confluence, Bitbucket and Crowd AWS CloudFormation stacks. Using Aerosol you can; create, delete and view the current status of a stack. Aerosol also allows you to easily open an ssm session to the associated EC2 instances for a stack.
 
 ## AWS Account auth
 Aerosol requires an `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` to interact with CloudFormation. Authenticate to your AWS account using your favoured authentication mechanism. These tokens must then be added to `~/.aws/credentials`. More info on this topic can be found [here](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)

@@ -25,7 +25,7 @@ const jiraProductParams = `[
     },
     {
         "ParameterKey": "CidrBlock",
-        "ParameterValue": "0.0.0.0/0"
+        "ParameterValue": "{{&accessCidrBlock}}"
     },
     {
         "ParameterKey": "QSS3BucketName",
@@ -68,7 +68,7 @@ const confluenceProductParams = `[
   },
   {
     "ParameterKey": "CidrBlock",
-    "ParameterValue": "0.0.0.0/0"
+    "ParameterValue": "{{&accessCidrBlock}}"
   },
   {
     "ParameterKey": "QSS3BucketName",
@@ -80,5 +80,45 @@ const confluenceProductParams = `[
   }
 ]`
 
+const bitbucketProductParams = `[
+    {
+      "ParameterKey": "DBMultiAZ",
+      "ParameterValue": "{{multiAzDB}}"
+    },
+    {
+      "ParameterKey": "DBMasterUserPassword",
+      "ParameterValue": "{{dbPassword}}"
+    },
+    {
+      "ParameterKey": "BitbucketAdminPassword",
+      "ParameterValue": ""
+    },
+    {
+      "ParameterKey": "CidrBlock",
+      "ParameterValue": "{{&accessCidrBlock}}"
+    },
+    {
+      "ParameterKey": "DBPassword",
+      "ParameterValue": "{{dbPassword}}"
+    },
+    {
+      "ParameterKey": "ClusterNodeInstanceType",
+      "ParameterValue": "t3.medium"
+    },
+    {
+      "ParameterKey": "DBInstanceClass",
+      "ParameterValue": "db.t3.medium"
+    },
+    {
+      "ParameterKey": "QSS3BucketName",
+      "ParameterValue": "aws-quickstart"
+    },
+    {
+      "ParameterKey": "QSS3KeyPrefix",
+      "ParameterValue": "{{&productPrefix}}"
+    }
+]`
+
 exports.jiraProductParams = jiraProductParams;
 exports.confluenceProductParams = confluenceProductParams;
+exports.bitbucketProductParams = bitbucketProductParams;
