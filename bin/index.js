@@ -13,6 +13,7 @@ const _ = require('lodash');
 const fuzzy = require('fuzzy');
 const ora = require('ora');
 const spinner = ora();
+const fetch = require('node-fetch');
 
 const azs = [];
 let availableStacks = [];
@@ -42,39 +43,40 @@ const DELETE_CFN_STACK = 'delete stack';
 const STACK_STATUS = 'stack status';
 
 const awsActions = [SSM_START_SESSION, CREATE_STACK, STACK_STATUS, DELETE_CFN_STACK]
-const stackTypes = ['Jira', 'BitBucket', 'Confluence', 'Crowd']
+const stackTypes = ['Jira', 'Bitbucket', 'Confluence', 'Crowd']
 
 const asiParams = new Map([
     ['Jira', require('./assets/asiParams').jiraAsiParams],
     ['Confluence', require('./assets/asiParams').confluenceAsiParams], 
-    ['BitBucket', require('./assets/asiParams').bitbucketAsiParams],
+    ['Bitbucket', require('./assets/asiParams').bitbucketAsiParams],
     ['Crowd', require('./assets/asiParams').jiraAsiParams], 
 ])
 
 const productParams = new Map([
     ['Jira', require('./assets/productParams').jiraProductParams],
     ['Confluence', require('./assets/productParams').confluenceProductParams],
+    ['Bitbucket', require('./assets/productParams').bitbucketProductParams],
     ['Crowd', require('./assets/productParams').jiraProductParams]
 ])
 
 const asiTemplates = new Map([
     ['Jira', 'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-jira/templates/quickstart-jira-dc-with-vpc.template.yaml'],
     ['Confluence', 'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-confluence/templates/quickstart-confluence-master-with-vpc.template.yaml'],
-    ['BitBucket', 'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-bitbucket/templates/quickstart-bitbucket-dc-with-vpc.template.yaml'],
+    ['Bitbucket', 'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-bitbucket/templates/quickstart-bitbucket-dc-with-vpc.template.yaml'],
     ['Crowd', 'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-crowd/templates/quickstart-crowd-dc-with-vpc.template.yaml'],
 ]);
 
 const productTemplates = new Map([
     ['Jira', 'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-jira/templates/quickstart-jira-dc.template.yaml'],
     ['Confluence', 'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-confluence/templates/quickstart-confluence-master.template.yaml'],
-    ['BitBucket', 'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-bitbucket/templates/quickstart-bitbucket-dc.template.yaml'],
+    ['Bitbucket', 'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-bitbucket/templates/quickstart-bitbucket-dc.template.yaml'],
     ['Crowd', 'https://aws-quickstart.s3.amazonaws.com/quickstart-atlassian-crowd/templates/quickstart-crowd-dc.template.yaml'],
 ])
 
 const productPrefixes = new Map([
     ['Jira', 'quickstart-atlassian-jira/'],
     ['Confluence', 'quickstart-atlassian-confluence/'],
-    ['BitBucket', 'quickstart-atlassian-bitbucket/'],
+    ['Bitbucket', 'quickstart-atlassian-bitbucket/'],
     ['Crowd', 'quickstart-atlassian-crowd/'],
 ])
 
@@ -145,9 +147,11 @@ figlet.text('Aerosol', {
  * are defaulted. For now the ExportPrefix is 
  * always defaulted to `ATL-`
  */
-function createStack() {
+async function createStack() {
     const stackProtection = ['Termination protection', 'Shutdown protection']
     loadAvailabilityZones()
+    const localCidrBlock = await getPublicIpCidr();
+    console.log(chalk.blue(`${emoji.get('information_source')}  CIDR for your IP is: ${localCidrBlock}`))
     inquirer
         .prompt([
             {
@@ -208,10 +212,18 @@ function createStack() {
                 },
             },
             {
+                type: 'input',
+                name: 'accessCidrBlock',
+                message: `${emoji.get('nine')}  What is the CIDR block to allow access (your IP == ${localCidrBlock})"`,
+                when: function (answers) {
+                    return !answers.quickDeploy;
+                },
+            },
+            {
                 type: 'checkbox',
                 checked: true,
                 name: 'stackProtection',
-                message: `${emoji.get('nine')}  Select the protection levels:`,
+                message: `${emoji.get('ten')}  Select the protection levels:`,
                 choices: stackProtection,
                 when: function (answers) {
                     return answers.enableStackProtection;
@@ -228,6 +240,7 @@ function createStack() {
                 answers.multiAzDB = false
                 answers.availabilityZones = [azs[0], azs[1]]
                 answers.productPrefix = productPrefixes.get(answers.productStack)
+                answers.accessCidrBlock = localCidrBlock
             }
             answers.productPrefix = productPrefixes.get(answers.productStack)
 
@@ -256,16 +269,14 @@ function createStack() {
                 TemplateURL: answers.deploymentType === 'Deploy into a new ASI'
                     ? asiTemplates.get(answers.productStack)
                     : productTemplates.get(answers.productStack),
-            };
-            if (answers.applyAntiShutDownTags) {
-                params.Tags = [
+                Tags: [
                     {
                         "Key": "Name",
                         "Value": `${answers.productStack}-aerosol-deployment`
                     },
                     {
                         "Key": "business_unit",
-                        "Value": 'DC-Deployments'
+                        "Value": 'Engineering-Server'
                     },
                     {
                         "Key": "service_name",
@@ -273,10 +284,10 @@ function createStack() {
                     },
                     {
                         "Key": "resource_owner",
-                        "Value": 'DC-Deployments'
+                        "Value": process.env.USER
                     }
                 ]
-            }
+            };
             cloudformation.createStack(params, function (err, data) {
                 if (err) handlerError(err)
                 else {
@@ -562,4 +573,14 @@ function loadAvailabilityZones() {
             azs.push(zone.ZoneName)
         });
     });
+}
+
+/**
+ * Returns public IP that is used to secure the created stack
+ */
+async function getPublicIpCidr() {
+    const url = 'https://api.ipify.org?format=json';
+    return await fetch(url)
+        .then(res => res.json())
+        .then(body => `${body.ip}/32`)
 }

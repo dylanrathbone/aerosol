@@ -33,7 +33,7 @@ const jiraAsiParams = `[
     },
     {
         "ParameterKey": "AccessCIDR",
-        "ParameterValue": "0.0.0.0/0"
+        "ParameterValue": "{{&accessCidrBlock}}"
     }
 ]`
 
@@ -91,7 +91,7 @@ const bitbucketAsiParams = `[
     },
     {
         "ParameterKey": "AccessCIDR",
-        "ParameterValue": "10.0.0.0/0"
+        "ParameterValue": "{{&accessCidrBlock}}"
     },
     {
         "ParameterKey": "DBMultiAZ",
