@@ -223,7 +223,7 @@ async function createStack() {
                 type: 'checkbox',
                 checked: true,
                 name: 'stackProtection',
-                message: `${emoji.get('ten')}  Select the protection levels:`,
+                message: `${emoji.get('keycap_ten')} Select the protection levels:`,
                 choices: stackProtection,
                 when: function (answers) {
                     return answers.enableStackProtection;
