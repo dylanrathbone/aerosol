@@ -151,7 +151,6 @@ async function createStack() {
     const stackProtection = ['Termination protection', 'Shutdown protection']
     loadAvailabilityZones()
     const localCidrBlock = await getPublicIpCidr();
-    console.log(chalk.blue(`${emoji.get('information_source')}  CIDR for your IP is: ${localCidrBlock}`))
     inquirer
         .prompt([
             {
@@ -292,6 +291,7 @@ async function createStack() {
                 if (err) handlerError(err)
                 else {
                     console.log(chalk.green(`${emoji.get('rocket')} Preparing for deployment...`))
+                    console.log(chalk.green(`${emoji.get('information_source')}  CIDR for your IP is: ${localCidrBlock}`))
                     let stackUrl = `https://${awsDetails.region}.console.aws.amazon.com/cloudformation/home?region=${awsDetails.region}#/stacks/stackinfo?filteringText=&filteringStatus=active&viewNested=false&hideStacks=false&stackId=${data.StackId}`
                     console.log(chalk.green(`${emoji.get('pancakes')} View stack from AWS console:`), stackUrl);
                     getStackStatus(answers)
