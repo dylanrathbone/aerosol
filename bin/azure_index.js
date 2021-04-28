@@ -14,8 +14,6 @@ const fuzzy = require('fuzzy');
 const ora = require('ora');
 const spinner = ora();
 const fetch = require('node-fetch');
-const notifier = require('node-notifier');
-
 
 const azs = [];
 let availableStacks = [];
@@ -504,14 +502,6 @@ function getStackStatus(answer) {
             switch (data.Stacks[0].StackStatus) {
                 case 'CREATE_COMPLETE':
                     console.log(chalk.green(`\n  ${emoji.get('white_check_mark')} creation complete for stack: ${answer.stackName} `));
-                    notifier.notify(
-                        {
-                            title: `${emoji.get('tada')}  Deployment complete!`,
-                            message: `QuickStart deployment complete`,
-                            sound: "Blow",
-                            timeout: 10,
-                        },
-                    );
                     process.exit()
                     break;
                 case 'DELETE_COMPLETE':
