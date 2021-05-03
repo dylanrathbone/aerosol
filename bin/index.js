@@ -97,7 +97,6 @@ figlet.text('Aerosol', {
     console.log(chalk.yellow(`${data}`));
     console.log(chalk.yellow(`\t\t\t\t\t CloudFormation in a can `))
     console.log(chalk.yellow(`\t\t\t\t\t\t\   version 1.0.0`))
-    // console.log(chalk.yellow(`\t\t\t\t\t\t\       ${sparkles}${sparkles}${sparkles}`))
     console.log('\n')
     inquirer.registerPrompt('autocomplete', require('inquirer-autocomplete-prompt'));
     inquirer
@@ -506,8 +505,8 @@ function getStackStatus(answer) {
                     console.log(chalk.green(`\n  ${emoji.get('white_check_mark')} creation complete for stack: ${answer.stackName} `));
                     notifier.notify(
                         {
-                            title: `${emoji.get('tada')}  Deployment complete!`,
-                            message: `QuickStart deployment complete`,
+                            title: `${emoji.get('tada')}  ${answer.stackName} deployment complete!`,
+                            message: `QuickStart deployment complete!`,
                             sound: "Blow",
                             timeout: 10,
                         },
