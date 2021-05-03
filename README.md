@@ -27,7 +27,7 @@ npm install
 To run
 
 ```bash
-node .
+node bin/index.js
 ``` 
 
 ## Description
