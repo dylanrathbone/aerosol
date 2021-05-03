@@ -455,7 +455,7 @@ function deleteStack() {
                         cloudformation.deleteStack(params, function (err, data) {
                             if (err) handlerError(err)
                             else {
-                                console.log(chalk.green(`Preparing to delete stack [${answers.stackName}] now...`))
+                                console.log(chalk.green(`${emoji.get('information_source')} Preparing to delete stack [${answers.stackName}] now...`))
                                 getStackStatus(answers)
                             }
                         });
@@ -516,6 +516,14 @@ function getStackStatus(answer) {
                 case 'DELETE_COMPLETE':
                     console.log(data.Stacks[0])
                     console.log(chalk.green(`\n  ${emoji.get('white_check_mark')} deletion complete for stack: ${answer.stackName} `));
+                    notifier.notify(
+                        {
+                            title: `${emoji.get('tada')}  ${answer.stackName} deleted!`,
+                            message: `QuickStart deployment deleted!`,
+                            sound: "Blow",
+                            timeout: 10,
+                        },
+                    );
                     process.exit()
                     break;
                 case 'CREATE_FAILED':
